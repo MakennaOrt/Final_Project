@@ -1,0 +1,103 @@
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt5.QtCore import pyqtSignal
+
+class SummaryWindow(QtWidgets.QWidget):
+   tip_entered = pyqtSignal(float)
+
+
+   def __init__(self, cart, menu_prices):
+       super(SummaryWindow, self).__init__()
+
+
+       self.setGeometry(1100, 200, 300, 250)
+       self.setWindowTitle('Order Summary')
+
+
+       self.cart = cart
+       self.menu_prices = menu_prices
+       self.tax_rate = 5.5  # Add tax rate in percentage
+
+
+       self.init_ui()
+
+
+   def init_ui(self):
+       layout = QVBoxLayout()
+
+
+       summary_label = QLabel("Order Summary", self)
+       layout.addWidget(summary_label)
+
+
+       for item in self.cart:
+           item_label = QLabel(item, self)
+           layout.addWidget(item_label)
+
+
+       total_before_tax = sum(self.menu_prices[item] for item in self.cart)
+       tax_amount = (total_before_tax * self.tax_rate) / 100
+       total_with_tax = total_before_tax + tax_amount
+
+
+       total_label = QLabel(f"Total (Before Tax): ${total_before_tax:.2f}", self)
+       layout.addWidget(total_label)
+
+
+       tax_label = QLabel(f"Tax ({self.tax_rate}%): ${tax_amount:.2f}", self)
+       layout.addWidget(tax_label)
+
+
+       tip_label = QLabel("Enter Tip (%):", self)
+       layout.addWidget(tip_label)
+
+
+       self.tip_input = QtWidgets.QLineEdit(self)
+       layout.addWidget(self.tip_input)
+
+
+       tip_button = QPushButton("OK", self)
+       tip_button.clicked.connect(self.handle_ok_button)
+       layout.addWidget(tip_button)
+
+
+       total_with_tip_label = QLabel("Total (With Tax and Tip): $0.00", self)
+       total_with_tip_label.setObjectName("TotalWithTipLabel")
+       layout.addWidget(total_with_tip_label)
+
+
+       self.setLayout(layout)
+
+
+   def handle_ok_button(self):
+       tip_text = self.tip_input.text()
+       try:
+           tip_percent = float(tip_text)
+       except ValueError:
+           QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid numeric tip.")
+           return
+
+
+       if 0 <= tip_percent <= 100:
+           self.tip = tip_percent
+
+
+           total_before_tax = sum(self.menu_prices[item] for item in self.cart)
+           tax_amount = (total_before_tax * self.tax_rate) / 100
+           total_with_tax = total_before_tax + tax_amount
+           total_with_tip = total_with_tax + (total_with_tax * self.tip) / 100
+
+
+           total_with_tip_label = self.findChild(QLabel, "TotalWithTipLabel")
+           total_with_tip_label.setText(f"Total (With Tax and Tip): ${total_with_tip:.2f}")
+
+
+           self.tip_entered.emit(total_with_tip)
+       else:
+           QtWidgets.QMessageBox.warning(self, "Invalid Input", "Tip must be between 0 and 100.")
+
+
+   def get_tip(self):
+       return getattr(self, 'tip', None)
+
+
