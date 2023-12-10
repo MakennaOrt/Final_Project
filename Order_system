@@ -1,0 +1,176 @@
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import pyqtSignal
+from results_window import SummaryWindow
+
+class OrderSystemApp(QMainWindow):
+   def __init__(self):
+       super(OrderSystemApp, self).__init__()
+
+
+       self.setGeometry(1000, 200, 300, 750)
+       self.setWindowTitle('Order System')
+       self.font = QFont()
+       self.font.setPointSize(16)
+       self.font2 = QFont()
+       self.font2.setPointSize(10)
+
+
+       self.summary_window = None
+
+
+       self.menu_prices = {
+           "6 Wings - $4.99": 4.99,
+           "9 Wings - $6.99": 6.99,
+           "Chicken Noodle - $3.99": 3.99,
+           "Chicken Dumpling - $4.99": 4.99,
+           "Tomato - $3.99": 3.99,
+           "Caesar - 4.99": 4.99,
+           "Greek - 3.99": 3.99,
+           "Regular - $7.99": 7.99,
+           "Bacon - $8.99": 8.99,
+           "Turkey - $7.99": 7.99,
+           "3 tenders - $5.99": 5.99,
+           "5 tenders - $8.99": 8.99,
+           "Chicken Alfredo - $12.99": 12.99,
+           "Spaghetti - $10.99": 10.99,
+           "Mac & Cheese - $10.99": 10.99,
+           "Apple Pie - $4.99": 4.99,
+           "Peach Pie - $4.99": 4.99,
+           "Cream Pie - $3.99": 3.99,
+           "Mixed Berry Pie - $4.99": 4.99,
+           "Fruit Sundae - $2.99": 2.99,
+           "Chocolate Sundae - $3.99": 3.99,
+           "Vanilla Sundae - $2.99": 2.99,
+       }
+
+
+       self.cart = []
+       self.init_ui()
+
+
+   def init_ui(self):
+       self.app_label = QtWidgets.QLabel(self)
+       self.app_label.setText("Appetizers")
+       self.app_label.setGeometry(10, 6, 150, 25)
+       self.app_label.setFont(self.font)
+
+
+       self.wings_label = QtWidgets.QLabel(self)
+       self.wings_label.setText("Chicken Wings-")
+       self.wings_label.setGeometry(25, 33, 150, 25)
+       self.wings_label.setFont(self.font2)
+       self.wings_checkboxes = self.create_checkbox(["6 Wings - $4.99", "9 Wings - $6.99"], (35, 58, 200, 18))
+
+
+       self.soup_label = QtWidgets.QLabel(self)
+       self.soup_label.setText("Soup-")
+       self.soup_label.setGeometry(25, 95, 300, 25)
+       self.soup_label.setFont(self.font2)
+       self.soup_checkboxes = self.create_checkbox(
+           ["Chicken Noodle - $3.99", "Chicken Dumpling - $4.99", "Tomato - $3.99"],
+           (35, 120, 200, 20))
+
+
+       self.salad_label = QtWidgets.QLabel(self)
+       self.salad_label.setText("Salad-")
+       self.salad_label.setGeometry(25, 180, 300, 25)
+       self.salad_label.setFont(self.font2)
+       self.salad_checkboxes = self.create_checkbox(['Caesar - 4.99', 'Greek - 3.99'], (35, 204, 200, 20))
+
+
+       self.main_label = QtWidgets.QLabel(self)
+       self.main_label.setText("Entrees")
+       self.main_label.setGeometry(10, 248, 100, 30)
+       self.main_label.setFont(self.font)
+
+
+       self.burger_label = QtWidgets.QLabel(self)
+       self.burger_label.setText("Burger-")
+       self.burger_label.setGeometry(25, 260, 200, 50)
+       self.burger_label.setFont(self.font2)
+       burger_checkboxes = self.create_checkbox(["Regular - $7.99", "Bacon - $8.99", "Turkey - $7.99"],
+                                                (35, 296, 200, 20))
+
+
+       self.tender_label = QtWidgets.QLabel(self)
+       self.tender_label.setText("Chicken Tenders-")
+       self.tender_label.setGeometry(25, 357, 140, 20)
+       self.tender_label.setFont(self.font2)
+       tender_checkboxes = self.create_checkbox(['3 tenders - $5.99', '5 tenders - $8.99'], (35, 378, 200, 20))
+
+
+       self.pasta_label = QtWidgets.QLabel(self)
+       self.pasta_label.setText("Pasta-")
+       self.pasta_label.setGeometry(25, 420, 110, 20)
+       self.pasta_label.setFont(self.font2)
+       pasta_checkboxes = self.create_checkbox(['Chicken Alfredo - $12.99', 'Spaghetti - $10.99',
+                                                'Mac & Cheese - $10.99'], (35, 440, 150, 20))
+
+
+       self.dessert_label = QtWidgets.QLabel(self)
+       self.dessert_label.setText("Dessert")
+       self.dessert_label.setGeometry(10, 485, 100, 50)
+       self.dessert_label.setFont(self.font)
+
+
+       self.pie_label = QtWidgets.QLabel(self)
+       self.pie_label.setText("Pie-")
+       self.pie_label.setGeometry(25, 520, 25, 20)
+       self.pie_label.setFont(self.font2)
+       pie_checkboxes = self.create_checkbox(
+           ['Apple Pie - $4.99', 'Peach Pie - $4.99', 'Cream Pie - $3.99', 'Mixed Berry Pie - $4.99'],
+           (35, 538, 150, 25))
+
+
+       self.sundae_label = QtWidgets.QLabel(self)
+       self.sundae_label.setText("Sundae-")
+       self.sundae_label.setGeometry(25, 620, 65, 25)
+       self.sundae_label.setFont(self.font2)
+       sundae_checkboxes = self.create_checkbox(['Fruit Sundae - $2.99', 'Chocolate Sundae - $3.99', 'Vanilla Sundae - $2.99'],
+                                                (35, 645, 115, 25))
+
+
+       self.confirm_button = QPushButton("OK", self)
+       self.confirm_button.setGeometry(225, 695, 50, 25)
+       self.confirm_button.clicked.connect(self.show_summary)
+
+
+   def create_checkbox(self, texts, geometry):
+       checkboxes = []
+       vertical_spacing = 20
+       for i, text in enumerate(texts):
+           checkbox = self.create_checkbox_item(text, (geometry[0], geometry[1] + vertical_spacing * i,
+                                                      geometry[2], geometry[3]))
+           checkboxes.append(checkbox)
+       return checkboxes
+
+
+   def create_checkbox_item(self, text, geometry):
+       checkbox = QtWidgets.QCheckBox(self)
+       checkbox.setText(text)
+       checkbox.setGeometry(*geometry)
+       checkbox.stateChanged.connect(lambda: self.update_cart(text, checkbox.isChecked()))
+       return checkbox
+
+
+   def update_cart(self, item, is_checked):
+       if is_checked:
+           self.cart.append(item)
+       else:
+           self.cart.remove(item)
+
+
+       print("Current Cart:", self.cart)
+
+
+   def show_summary(self):
+       self.summary_window = SummaryWindow(self.cart, self.menu_prices)
+       self.summary_window.tip_entered.connect(self.handle_tip_entered)
+       self.summary_window.show()
+
+
+   def handle_tip_entered(self, total_with_tip):
+       print(f"Total With Tax and Tip: ${total_with_tip:.2f}")
+
